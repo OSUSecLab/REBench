@@ -1,0 +1,1 @@
+python3 type_evaluation.py --model model_name --arch arch --opt opt
