@@ -29,7 +29,6 @@ except:  # noqa: E722
 def main(
     load_8bit: bool = False,
     base_model: str = "",
-    #lora_weights: str = "tloen/alpaca-lora-7b",
     lora_weights: str = "",
     prompt_template: str = "codellama",  # The prompt template to use, will default to alpaca.
     server_name: str = "0.0.0.0",  # Allows to listen on all interfaces by providing '0.
@@ -43,8 +42,6 @@ def main(
     ), "Please specify a --base_model, e.g. --base_model='huggyllama/llama-7b'"
 
     prompter = Prompter(prompt_template)
-    #tokenizer = AutoTokenizer.from_pretrained(base_model)
-    #tokenizer = LlamaTokenizer.from_pretrained(base_model)
     tokenizer = CodeLlamaTokenizer.from_pretrained(base_model)
 
     if device == "cuda":
@@ -62,13 +59,9 @@ def main(
             torch_dtype=torch.float16,
         )
 
-    # unwind broken decapoda-research config
     model.config.pad_token_id = tokenizer.pad_token_id = 0  # unk
     model.config.bos_token_id = 1
     model.config.eos_token_id = 2
-    # print(repr(tokenizer.pad_token)) ## ''
-    # print(repr(tokenizer.bos_token)) ## ''
-    # print(repr(tokenizer.eos_token)) ## ''
 
     if not load_8bit:
         model.half()  # seems to fix bugs for some users.
@@ -89,16 +82,8 @@ def main(
         stream_output=False,
         **kwargs,
     ):
-        # if inputList is None:
-        #     prompt = [prompter.generate_prompt(instruction, None) for instruction in instructionList]
-        # else:
-        #     prompt = [prompter.generate_prompt(instruction, input) for instruction, input in zip(instructionList, inputList)]
-
-        # print(prompt)
-        # inputs = tokenizer.batch_encode_plus(prompt, return_tensors="pt", padding=True, truncation=True)
 
         prompt = prompter.generate_prompt(instructionList, inputList)
-        #prompt = f"<s>[INST] <<SYS>>\\n{instructionList}\\n<</SYS>>\\n\\n{inputList}[/INST]"
         inputs = tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(device)
         attention_mask = inputs['attention_mask'].to(device)
@@ -133,9 +118,6 @@ def main(
                 )
                 s = generation_output.sequences[0]
                 output = tokenizer.decode(s)
-                # s = generation_output.sequences
-                # output = tokenizer.batch_decode(s, skip_special_tokens=True)
-                # return output # codellama
                 return prompter.get_response(output) # llama2
             else:
                 return ""
@@ -146,17 +128,11 @@ def main(
     funcs = json.load(fp)
 
     output = {}
-    #fout = open(fileoutput, 'w')
     for k, v in funcs.items():
         instruction =  "Let's assume you are a programmer. An assembly code is given, and the name of the function is unknown. Could you infer the name of the function? Please give the function name as follows: e.g., \"FUNC: printf\"."
         inputs = "Now here is an assembly code: \n" + v["assembly"]
         print (k, len(inputs.split()))
         res = evaluate(instruction, inputs)
-        #print('-' * 80)
-        ##print(instruction)
-        #print(inputs)
-        #print(res)
-        #print('-' * 80)
         output[k] = res
 
     with open("asm_finetune_output/codellama_"  + arch + "_" + opt + "_asm.json", 'w') as fout:

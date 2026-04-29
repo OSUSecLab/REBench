@@ -25,16 +25,8 @@ def find_v(text):
     return bool(re.search(pattern, text))
 
 def main():
-    # diff
-    #outputname = '../diff_result/' + str(sys.argv[1]) + '_' +  str(sys.argv[4]) + '_' + str(sys.argv[2]) + '_' + str(sys.argv[3]) + '.json'
-
     answername = '../inputs/' + str(sys.argv[2]) + '_' +  str(sys.argv[3]) + '_input.json'
     outputname = '../output_result/' + str(sys.argv[1]) + '_' + str(sys.argv[2]) + '_' + str(sys.argv[3]) + '.json'
-    #outputname = '../finetune_result/' + str(sys.argv[1]) + '_' + str(sys.argv[2]) + '_' + str(sys.argv[3]) + '.json'
-
-    # real world
-    #answername = '../real_world/' + str(sys.argv[2]) + '_input.json'
-    #outputname = '../real_result/' + str(sys.argv[1]) + '_' + str(sys.argv[2]) + '.json'
 
     fp = open(answername, 'r')
     answer_gt = json.load(fp)
@@ -77,8 +69,6 @@ def main():
             if len(line.split(':')) != 2:
                 continue
 
-            #if len(line.split()) != 2:
-            #    continue
 
             target = line.split(':')[0]
             value = line.split(':')[1].split('<')[0]
@@ -165,33 +155,11 @@ def main():
                             var_output.append(result)
 
     # normal analysis
-    ##fp = open('evaluation_input_' + str(sys.argv[1]) + '_' +  str(sys.argv[2]) + '_' + str(sys.argv[3]) + '_func.txt', 'w')
-    #fp = open('evaluation_input_' + str(sys.argv[1]) + '_' +  str(sys.argv[2]) + '_func.txt', 'w')
-    #for line in func_output:
-    #    fp.write(line)
-    #fp.close()
-
-    ##fp = open('evaluation_input_' + str(sys.argv[1]) + '_' + str(sys.argv[2]) + '_' + str(sys.argv[3]) + '_var.txt', 'w')
-    #fp = open('evaluation_input_' + str(sys.argv[1]) + '_' + str(sys.argv[2]) + '_var.txt', 'w')
-    #for line in var_output:
-    #    fp.write(line)
-    #fp.close()
-
-    ##print (f'{sys.argv[1]} {sys.argv[2]} {sys.argv[3]} {gt_func_cnt} {func_total} {gt_var_cnt} {var_total}')
-    #print (f'{sys.argv[1]} {sys.argv[2]} {gt_func_cnt} {func_total} {gt_var_cnt} {var_total}')
-
-
-    #diff analysis
-    #fp = open('evaluation_input_' + str(sys.argv[1]) + '_' +  str(sys.argv[4]) + "_" +  str(sys.argv[2]) + '_' + str(sys.argv[3]) + '_func.txt', 'w')
-    #for line in func_output:
-    #    fp.write(line)
-    #fp.close()
-
-    #fp = open('evaluation_input_' + str(sys.argv[1]) + '_' + str(sys.argv[4]) + '_' + str(sys.argv[2]) + '_' + str(sys.argv[3]) + '_var.txt', 'w')
-    #for line in var_output:
-    #    fp.write(line)
-    #fp.close()
-    #print (f'{sys.argv[1]} {sys.argv[2]} {sys.argv[3]} {sys.argv[4]} {gt_func_cnt} {func_total} {gt_var_cnt} {var_total}')
+    #fp = open('evaluation_input_' + str(sys.argv[1]) + '_' +  str(sys.argv[2]) + '_' + str(sys.argv[3]) + '_func.txt', 'w')
+    fp = open('evaluation_input_' + str(sys.argv[1]) + '_' +  str(sys.argv[2]) + '_func.txt', 'w')
+    for line in func_output:
+        fp.write(line)
+    fp.close()
 
 
     # without codewordnet

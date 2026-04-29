@@ -193,10 +193,6 @@ def train(
     fileinput = "asm_finetune_script/whole.json"
     fp = open(fileinput, 'r')
     funcs = json.load(fp)
-    #if data_path.endswith(".json") or data_path.endswith(".jsonl"):
-    #    data = load_dataset("json", data_files=data_path)
-    #else:
-    #    data = load_dataset(data_path)
 
     if resume_from_checkpoint:
         # Check the available weights and load them
@@ -220,19 +216,6 @@ def train(
 
     model.print_trainable_parameters()  # Be more transparent about the % of trainable params.
 
-    #if val_set_size > 0:
-    #    train_val = data["train"].train_test_split(
-    #        test_size=val_set_size, shuffle=True, seed=42
-    #    )
-    #    train_data = (
-    #        train_val["train"].shuffle().map(generate_and_tokenize_prompt)
-    #    )
-    #    val_data = (
-    #        train_val["test"].shuffle().map(generate_and_tokenize_prompt)
-    #    )
-    #else:
-    #    train_data = data["train"].shuffle().map(generate_and_tokenize_prompt)
-    #    val_data = None
     train_data = []
     val_data = []
     for k, v in funcs.items():
@@ -242,10 +225,7 @@ def train(
         temp["input"] = "Now here is an assembly code: \n" + v["assembly"]
         temp["output"] = v["answer"]["FUNC1"]
 
-        #if int(k) < 350:
         train_data.append(generate_and_tokenize_prompt(temp))
-        #else:
-        #    val_data.append(generate_and_tokenize_prompt(temp))
     random.shuffle(train_data)
     idx = int(len(train_data)*0.80)
     tr_data = train_data[:idx]
@@ -288,11 +268,6 @@ def train(
     model.config.use_cache = False
 
     old_state_dict = model.state_dict
-    #model.state_dict = (
-    #    lambda self, *_, **__: get_peft_model_state_dict(
-    #        self, old_state_dict()
-    #    )
-    #).__get__(model, type(model))
 
     if torch.__version__ >= "2" and sys.platform != "win32":
         model = torch.compile(model)

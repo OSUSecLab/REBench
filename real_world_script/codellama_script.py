@@ -15,14 +15,6 @@ import json
 
 code_type = 'decompile'
 model_type = 'CodeLlama-34b-Instruct'
-#model_type = 'Llama-2-13b-chat-hf'
-#python3.11 codellama_script.py --base_model="meta-llama/Llama-2-7b-chat-hf" --filename var
-
-#input_path = '/data/local/linxi/alpaca-lora/mydata/data/' + code_type + '/'
-#output_path = '/data/local/linxi/alpaca-lora/mydata/result/' + code_type + '/' + model_type + '/'
-#
-#traindata_path = '/data/local/linxi/alpaca-lora/mydata/finetuning_data/' + code_type + '/80%BtrainFT.json'
-#testdata_path = '/data/local/linxi/alpaca-lora/mydata/finetuning_data/' + code_type + '/80%BtestFT.json'
 
 
 if torch.cuda.is_available():
@@ -55,10 +47,7 @@ def main(
     ), "Please specify a --base_model, e.g. --base_model='huggyllama/llama-7b'"
 
     prompter = Prompter(prompt_template)
-    #tokenizer = AutoTokenizer.from_pretrained(base_model)
-    #tokenizer = LlamaTokenizer.from_pretrained(base_model)
     tokenizer = CodeLlamaTokenizer.from_pretrained(base_model)
-    #tokenizer = CodeLlamaTokenizer.from_pretrained("codellama/CodeLlama-13b-Instruct-hf")
 
     if device == "cuda":
         if torch.cuda.is_bf16_supported():
@@ -79,17 +68,9 @@ def main(
             #load_in_8bit=True,
             dtype=torch.bfloat16,
             device_map="auto",
-            cache_dir='/data/local/junwon/models/',
+            cache_dir='models/',
             trust_remote_code=True,
         )
-
-        #model = LlamaForCausalLM.from_pretrained(
-        #    base_model,
-        #    load_in_8bit=load_8bit,
-        #    torch_dtype=torch.float16,
-        #    device_map="auto",
-        #    cache_dir='/data/local/junwon/models/',
-        #)
 
         model = PeftModel.from_pretrained(
             model,
@@ -102,9 +83,6 @@ def main(
     model.config.pad_token_id = tokenizer.pad_token_id = 0  # unk
     model.config.bos_token_id = 1
     model.config.eos_token_id = 2
-    # print(repr(tokenizer.pad_token)) ## ''
-    # print(repr(tokenizer.bos_token)) ## ''
-    # print(repr(tokenizer.eos_token)) ## ''
 
     if not load_8bit:
         model.half()  # seems to fix bugs for some users.
@@ -125,16 +103,8 @@ def main(
         stream_output=False,
         **kwargs,
     ):
-        # if inputList is None:
-        #     prompt = [prompter.generate_prompt(instruction, None) for instruction in instructionList]
-        # else:
-        #     prompt = [prompter.generate_prompt(instruction, input) for instruction, input in zip(instructionList, inputList)]
-
-        # print(prompt)
-        # inputs = tokenizer.batch_encode_plus(prompt, return_tensors="pt", padding=True, truncation=True)
 
         prompt = prompter.generate_prompt(instructionList, inputList)
-        #prompt = f"<s>[INST] <<SYS>>\\n{instructionList}\\n<</SYS>>\\n\\n{inputList}[/INST]"
         inputs = tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(device)
         attention_mask = inputs['attention_mask'].to(device)
@@ -169,15 +139,12 @@ def main(
                 )
                 s = generation_output.sequences[0]
                 output = tokenizer.decode(s)
-                # s = generation_output.sequences
-                # output = tokenizer.batch_decode(s, skip_special_tokens=True)
-                # return output # codellama
                 return prompter.get_response(output) # llama2
             else:
                 return ""
 
 
-    fileinput = "/data/local/junwon/binbench/real_world/" + decomp + "_input.json"
+    fileinput = "real_world/" + decomp + "_input.json"
     fp = open(fileinput, 'r')
     funcs = json.load(fp)
 
@@ -189,9 +156,7 @@ def main(
         res = evaluate(instruction, inputs)
         output[k] = res
 
-    with open(f"/data/local/junwon/binbench/real_world_output/codellama_{decomp}.json", 'w') as fout:
-    #with open(f"/data/local/junwon/binbench/finetune_output/codellama_large_{arch}_{opt}.json", 'w') as fout:
-    #with open(f"/data/local/junwon/binbench/real_output/codellama_small_{arch}_{opt}.json", 'w') as fout:
+    with open(f"real_world_output/codellama_{decomp}.json", 'w') as fout:
         json.dump(output, fout, indent=2)
 
 
