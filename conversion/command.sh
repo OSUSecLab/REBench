@@ -1,5 +1,5 @@
 #!/bin/bash
 
-/home/junyeon/Developer/tool/ghidra_11.4.2_PUBLIC/support/analyzeHeadless /home/ lecture -import ./csplit -readOnly -postScript ./ghidra_preprocess_1.py
-/home/junyeon/Developer/tool/ghidra_11.4.2_PUBLIC/support/analyzeHeadless /home/ lecture -import ./strip_csplit -readOnly -postScript ./ghidra_postprocess_1.py
-/home/Developer/ida/idat -L"ida.log" -A -S"./ida_process.py" binary 
+/path/to/ghidra/support/analyzeHeadless /home/ llm -import ./cat -readOnly -postScript ./ghidra_preprocess_1.py
+/path/to/ghidra/support/analyzeHeadless /home/ llm -import ./split_cat -readOnly -postScript ./ghidra_postprocess_1.py
+/path/to/ida/idat -L"ida.log" -A -S"./ida_process.py" binary 

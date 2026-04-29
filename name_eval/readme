@@ -1,4 +1,4 @@
-python3 parse.py codegen x64 O0
+python parse.py codegen x64 O0
 
-python3 evaluation.py --evaluation-input evaluation_input_codegen2_x64_O0_func.txt
-python3 evaluation.py --evaluation-input evaluation_input_codegen2_x64_O0_var.txt
+python evaluation.py --evaluation-input evaluation_input_codegen2_x64_O0_func.txt
+python evaluation.py --evaluation-input evaluation_input_codegen2_x64_O0_var.txt

@@ -43,3 +43,7 @@ To evaluate the type inference, please follow the execution step from the type_e
 ```
 python type_evaluation.py --model model_name --arch arch --opt opt
 ```
+
+## Dataset
+You can find binaries and generated decompiled code from the following link.
+
